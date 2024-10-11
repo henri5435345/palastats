@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informations du Joueur</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Lien vers votre fichier CSS -->
+</head>
+<body>
+    <h1>Informations du Joueur</h1>
+    <form id="playerForm">
+        <input type="text" id="playerName" placeholder="Entrez le nom du joueur" required>
+        <button type="submit">Rechercher</button>
+    </form>
+    <div id="result"></div>
+
+    <script>
+        async function loadPlayerInfo(playerName) {
+            try {
+                const response = await fetch(`https://localhost:7120/api/player/${playerName}`);
+                console.log(response); // Log de la réponse pour débogage
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayPlayerInfo(data);
+                } else {
+                    document.getElementById('result').innerText = "Erreur lors de la récupération des données.";
+                }
+            } catch (error) {
+                console.error("Erreur de requête :", error);
+                document.getElementById('result').innerText = "Erreur de requête.";
+            }
+        }
+
+        document.getElementById('playerForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Empêche le rechargement de la page
+            const playerName = document.getElementById('playerName').value;
+            await loadPlayerInfo(playerName); // Charge les infos du joueur
+        });
+
+        function displayPlayerInfo(data) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = ''; // Efface les résultats précédents
+
+            const playerInfo = document.createElement('div');
+            playerInfo.classList.add('player-info'); // Ajout de la classe pour le style
+            playerInfo.innerHTML = `<h2>Informations du Joueur</h2>
+                                            <pre>${JSON.stringify(data.playerInfo, null, 2)}</pre>`;
+            resultDiv.appendChild(playerInfo);
+
+            const friendsList = document.createElement('div');
+            friendsList.classList.add('player-info'); // Ajout de la classe pour le style
+            friendsList.innerHTML = `<h2>Liste des Amis</h2>
+                                            <pre>${JSON.stringify(data.friendsList, null, 2)}</pre>`;
+            resultDiv.appendChild(friendsList);
+
+            const playerJob = document.createElement('div');
+            playerJob.classList.add('player-info'); // Ajout de la classe pour le style
+            playerJob.innerHTML = `<h2>Emplois</h2>
+                                            <pre>${JSON.stringify(data.playerJob, null, 2)}</pre>`;
+            resultDiv.appendChild(playerJob);
+
+            const playerClicker = document.createElement('div');
+            playerClicker.classList.add('player-info'); // Ajout de la classe pour le style
+            playerClicker.innerHTML = `<h2>Clicker</h2>
+                                               <pre>${JSON.stringify(data.playerClicker, null, 2)}</pre>`;
+            resultDiv.appendChild(playerClicker);
+        }
+
+        // Appel initial pour charger les informations du joueur par défaut
+        loadPlayerInfo('ZZTheGreenzz'); // Remplacez 'ZZTheGreenzz' par le nom du joueur par défaut souhaité
+    </script>
+</body>
+</html>
